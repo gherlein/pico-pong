@@ -13,7 +13,7 @@ add_executable(main
     src/main.c
 )
 
-pico_enable_stdio_usb(main 1)
+pico_enable_stdio_usb(main 0)
 pico_enable_stdio_uart(main 1)
 
 target_include_directories(main PRIVATE
@@ -35,7 +35,7 @@ target_link_libraries(main
 )
 
 add_custom_target(flash
-    COMMAND /bin/bash ../flash
+    COMMAND /bin/bash ../flash main.elf
     DEPENDS main
 )
 

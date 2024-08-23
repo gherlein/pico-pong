@@ -6,19 +6,12 @@
  * \copyright Revised BSD License, see section \ref LICENSE.
  *
  * \code
- *                ______                              _
- *               / _____)             _              | |
- *              ( (____  _____ ____ _| |_ _____  ____| |__
- *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- *               _____) ) ____| | | || |_| ____( (___| | | |
- *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
- *              (C)2013-2017 Semtech
- *
+ * Derived from code in this zip file:  https://files.waveshare.com/wiki/RP2040-LoRa/Rp2040-lora-code.zip
+ * Found the code in this wiki: https://www.waveshare.com/wiki/RP2040-LoRa
  * \endcode
  *
- * \author    Miguel Luis ( Semtech )
+ * \author    Greg Herlein - gherlein@herlein.com - https://www.linkedin.com/in/gherlein/
  *
- * \author    Gregory Cristian ( Semtech )
  */
 #include <string.h>
 #include <stdio.h>
@@ -26,7 +19,6 @@
 #include "pico/binary_info.h"
 
 #include "pico/stdlib.h"
-// #include "tusb.h"
 #include "board.h"
 #include "radio-config.h"
 
@@ -96,7 +88,7 @@ int8_t RssiValue = 0;
 int8_t SnrValue = 0;
 
 /*!
- * Radio events function pointer
+ * Radio events function pointers
  */
 static RadioEvents_t RadioEvents;
 
@@ -140,9 +132,34 @@ int main(void)
     uint8_t i;
 
     // time to start a serial port monitor
-    sleep_ms(2000);
+    sleep_ms(10000);
 
     stdio_init_all();
+
+    printf("RADIO_RESET: %d\n", RADIO_RESET);
+    printf("RADIO_MOSI : %d\n", RADIO_MOSI);
+    printf("RADIO_MISO : %d\n", RADIO_MISO);
+    printf("RADIO_SCLK:  %d\n", RADIO_SCLK);
+    printf("RADIO_NSS :  %d\n", RADIO_NSS);
+    printf("RADIO_BUSY : %d\n", RADIO_BUSY);
+    printf("RADIO_DIO_1: %d\n", RADIO_DIO_1);
+    printf("RADIO_ANT_SWITCH_POWER : %d\n", RADIO_ANT_SWITCH_POWER);
+    fflush(stdout);
+    puts("");
+
+#define BLINK_WAIT
+#ifdef BLINK_WAIT
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+    while (1)
+    {
+        gpio_put(LED_PIN, 0);
+        sleep_ms(250);
+        gpio_put(LED_PIN, 1);
+        puts("Hello World\n");
+        sleep_ms(1000);
+    }
+#endif
 
     // Target board initialization
     BoardInitMcu();
@@ -152,6 +169,9 @@ int main(void)
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
 
+// #define RADIO_ENABLE
+#ifdef RADIO_ENABLE
+
     // Radio initialization
     RadioEvents.TxDone = OnTxDone;
     RadioEvents.RxDone = OnRxDone;
@@ -160,10 +180,11 @@ int main(void)
     RadioEvents.RxError = OnRxError;
 
     Radio.Init(&RadioEvents);
+
     // RP2040-LoRa-LF
-    Radio.SetChannel(433000000);
+    //    Radio.SetChannel(433000000);
     // RP2040-LoRa-HF
-    // Radio.SetChannel( 868000000 );
+    Radio.SetChannel(915000000);
 
 #if defined(USE_MODEM_LORA)
 
@@ -199,25 +220,6 @@ int main(void)
 
     Radio.Rx(RX_TIMEOUT_VALUE);
     SX126xAntSwOn();
-
-    printf("RADIO_RESET: %d\n", RADIO_RESET);
-    printf("RADIO_MOSI : %d\n", RADIO_MOSI);
-    printf("RADIO_MISO : %d\n", RADIO_MISO);
-    printf("RADIO_SCLK: %d\n", RADIO_SCLK);
-    printf("RADIO_NSS : %d\n", RADIO_NSS);
-    printf("RADIO_BUSY : %d\n", RADIO_BUSY);
-    printf("RADIO_DIO_1: %d\n", RADIO_DIO_1);
-    printf("RADIO_ANT_SWITCH_POWER : %d\n", RADIO_ANT_SWITCH_POWER);
-
-#define RADIO_MOSI 3
-#define RADIO_MISO 4
-#define RADIO_SCLK 2
-
-#define RADIO_NSS 13
-#define RADIO_BUSY 18
-#define RADIO_DIO_1 16
-
-#define RADIO_ANT_SWITCH_POWER 17
 
     while (1)
     {
@@ -401,6 +403,8 @@ int main(void)
             Radio.IrqProcess();
         }
     }
+
+#endif // RADIO_ENABLE
 }
 
 void OnTxDone(void)
