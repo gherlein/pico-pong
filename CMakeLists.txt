@@ -18,9 +18,9 @@ pico_enable_stdio_uart(main 1)
 
 target_include_directories(main PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}
-    includes
-    pico-sx126x/includes
-    semtech-pico-hal/includes
+    include
+    pico-sx126x/include
+    semtech-pico-hal/include
 )
 add_subdirectory(pico-sx126x)
 add_subdirectory(semtech-pico-hal)

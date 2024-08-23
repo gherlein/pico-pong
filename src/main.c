@@ -28,7 +28,7 @@
 #include "pico/stdlib.h"
 // #include "tusb.h"
 #include "board.h"
-#include "board-config.h"
+#include "radio-config.h"
 
 #include "radio.h"
 #include "sx126x.h"
