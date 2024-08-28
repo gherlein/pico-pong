@@ -33,3 +33,9 @@ debug:
 
 openocd:
 	sudo openocd -f interface/cmsis-dap.cfg -c "set USE_CORE 0" -f target/rp2040.cfg -c "adapter speed 5000" 
+
+git:
+	git add *
+	git commit -am"updated"
+	git push origin main
+
