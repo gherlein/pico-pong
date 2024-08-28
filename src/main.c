@@ -61,11 +61,6 @@ const uint LED_PIN = PICO_DEFAULT_LED_PIN;
 #error "Please define a modem in the compiler options."
 #endif
 
-void SPI_Init(spi_inst_t *spi);
-void GPIO_Init(void);
-static inline void cs_select(void);
-static inline void cs_deselect(void);
-
 typedef enum
 {
     LOWPOWER,
@@ -215,7 +210,7 @@ int main(void)
     BufferSize = 4;
 
     Radio.Rx(RX_TIMEOUT_VALUE);
-    SX126xAntSwOn();
+    // SX126xAntSwOn();
     while (1)
     {
         // Send the next PING frame
