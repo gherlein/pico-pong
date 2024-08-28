@@ -15,18 +15,17 @@
  */
 #include <string.h>
 #include <stdio.h>
-#include "hardware/gpio.h"
-#include "pico/binary_info.h"
+#include <stdbool.h>
 
+#include "hardware/gpio.h"
+#include "hardware/spi.h"
+#include "pico/binary_info.h"
 #include "pico/stdlib.h"
-#include "board.h"
 #include "radio-config.h"
 
 #include "radio.h"
 #include "sx126x.h"
 #include "sx126x-board.h"
-
-#include "delay.h"
 
 const uint LED_PIN = PICO_DEFAULT_LED_PIN;
 
@@ -61,6 +60,11 @@ const uint LED_PIN = PICO_DEFAULT_LED_PIN;
 #else
 #error "Please define a modem in the compiler options."
 #endif
+
+void SPI_Init(spi_inst_t *spi);
+void GPIO_Init(void);
+static inline void cs_select(void);
+static inline void cs_deselect(void);
 
 typedef enum
 {
@@ -146,35 +150,14 @@ int main(void)
     printf("RADIO_NSS :  %d\n", RADIO_NSS);
     printf("RADIO_BUSY : %d\n", RADIO_BUSY);
     printf("RADIO_DIO_1: %d\n", RADIO_DIO_1);
-    printf("RADIO_ANT_SWITCH_POWER : %d\n", RADIO_ANT_SWITCH_POWER);
     fflush(stdout);
     puts("");
 
-// #define BLINK_WAIT
-#ifdef BLINK_WAIT
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    while (1)
-    {
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 1);
-        puts("Hello World\n");
-        sleep_ms(1000);
-    }
-#endif
+    // gpio_init(LED_PIN);
+    // gpio_set_dir(LED_PIN, GPIO_OUT);
+    // gpio_put(LED_PIN, 1);
 
-    // Target board initialization
-    BoardInitMcu();
-    BoardInitPeriph();
-
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    gpio_put(LED_PIN, 1);
-
-    // SPI initialization
-    static Spi_t SpiPort;
-    SpiInit(&SpiPort, 0, RADIO_MOSI, RADIO_MISO, RADIO_SCLK, RADIO_NSS);
+    SPI_Init(spi0);
 
     // Radio initialization
     RadioEvents.TxDone = OnTxDone;
@@ -184,6 +167,7 @@ int main(void)
     RadioEvents.RxError = OnRxError;
 
     Radio.Init(&RadioEvents);
+    //   Radio.RadioSetBoardConfig(RADIO_RESET, RADIO_BUSY, RADIO_DIO_1, -1, -1, SpiPort);
 
     // RP2040-LoRa-LF
     //    Radio.SetChannel(433000000);
