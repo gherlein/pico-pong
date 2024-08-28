@@ -152,8 +152,6 @@ int main(void)
     // gpio_set_dir(LED_PIN, GPIO_OUT);
     // gpio_put(LED_PIN, 1);
 
-    SPI_Init(spi0);
-
     // Radio initialization
     RadioEvents.TxDone = OnTxDone;
     RadioEvents.RxDone = OnRxDone;
