@@ -26,3 +26,10 @@ clean:
 
 allow:
 	# alternate:  source envrc	
+
+debug:
+	cd build;gdb-multiarch main.elf -x ../gdb-connect-ocd
+#	target extended-remote :3333
+
+openocd:
+	sudo openocd -f interface/cmsis-dap.cfg -c "set USE_CORE 0" -f target/rp2040.cfg -c "adapter speed 5000" 

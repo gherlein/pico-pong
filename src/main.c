@@ -131,8 +131,11 @@ int main(void)
     bool isMaster = true;
     uint8_t i;
 
-    // time to start a serial port monitor
-    sleep_ms(10000);
+    // workaround for a hardware debug problem
+    // https://forums.raspberrypi.com/viewtopic.php?t=363914
+    // also in openocd you need to us -c "set USE_CORE 0"  before rp2040.cfg is loaded per https://github.com/raspberrypi/debugprobe/issues/45
+    timer_hw->dbgpause = 0;
+    sleep_ms(150);
 
     stdio_init_all();
 
@@ -147,7 +150,7 @@ int main(void)
     fflush(stdout);
     puts("");
 
-#define BLINK_WAIT
+// #define BLINK_WAIT
 #ifdef BLINK_WAIT
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
@@ -169,8 +172,9 @@ int main(void)
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
 
-// #define RADIO_ENABLE
-#ifdef RADIO_ENABLE
+    // SPI initialization
+    static Spi_t SpiPort;
+    SpiInit(&SpiPort, 0, RADIO_MOSI, RADIO_MISO, RADIO_SCLK, RADIO_NSS);
 
     // Radio initialization
     RadioEvents.TxDone = OnTxDone;
@@ -218,10 +222,33 @@ int main(void)
 #error "Please define a frequency band in the compiler options."
 #endif
 
+#define TEST_RADIO
+#ifdef TEST_RADIO
+    Buffer[0] = 'P';
+    Buffer[1] = 'I';
+    Buffer[2] = 'N';
+    Buffer[3] = 'G';
+    BufferSize = 4;
+
     Radio.Rx(RX_TIMEOUT_VALUE);
     SX126xAntSwOn();
-
     while (1)
+    {
+        // Send the next PING frame
+        gpio_put(LED_PIN, 0);
+        Radio.Send(Buffer, BufferSize);
+        sleep_ms(250);
+        printf(".");
+        fflush(stdout);
+        gpio_put(LED_PIN, 1);
+        sleep_ms(250);
+    }
+#endif
+
+// #define RADIO_ENABLE
+#ifdef RADIO_ENABLE
+
+    c while (1)
     {
         // printf(".");
         switch (State)
