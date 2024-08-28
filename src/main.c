@@ -139,12 +139,15 @@ int main(void)
     stdio_init_all();
 
     printf("RADIO_RESET: %d\n", RADIO_RESET);
-    printf("RADIO_MOSI : %d\n", RADIO_MOSI);
-    printf("RADIO_MISO : %d\n", RADIO_MISO);
-    printf("RADIO_SCLK:  %d\n", RADIO_SCLK);
-    printf("RADIO_NSS :  %d\n", RADIO_NSS);
-    printf("RADIO_BUSY : %d\n", RADIO_BUSY);
+    printf("RADIO_MOSI : %d %d\n", RADIO_MOSI, PICO_DEFAULT_SPI_TX_PIN);
+    printf("RADIO_MISO : %d %d \n", RADIO_MISO, PICO_DEFAULT_SPI_RX_PIN);
+    printf("RADIO_SCLK:  %d %d \n", RADIO_SCLK, PICO_DEFAULT_SPI_SCK_PIN);
+    printf("RADIO_NSS :  %d %d\n", RADIO_NSS, PICO_DEFAULT_SPI_CSN_PIN);
+    printf("RADIO_BUSY : %d \n", RADIO_BUSY);
     printf("RADIO_DIO_1: %d\n", RADIO_DIO_1);
+    printf("default spi: %d\n", spi_default);
+    printf("spi0       : %d\n", spi0);
+
     fflush(stdout);
     puts("");
 
