@@ -148,9 +148,9 @@ int main(void)
     fflush(stdout);
     puts("");
 
-    // gpio_init(LED_PIN);
-    // gpio_set_dir(LED_PIN, GPIO_OUT);
-    // gpio_put(LED_PIN, 1);
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+    gpio_put(LED_PIN, 1);
 
     // Radio initialization
     RadioEvents.TxDone = OnTxDone;
@@ -160,7 +160,14 @@ int main(void)
     RadioEvents.RxError = OnRxError;
 
     Radio.Init(&RadioEvents);
-    //   Radio.RadioSetBoardConfig(RADIO_RESET, RADIO_BUSY, RADIO_DIO_1, -1, -1, SpiPort);
+
+    while (1)
+    {
+        gpio_put(LED_PIN, 0);
+        sleep_ms(250);
+        gpio_put(LED_PIN, 1);
+        sleep_ms(250);
+    }
 
     // RP2040-LoRa-LF
     //    Radio.SetChannel(433000000);
