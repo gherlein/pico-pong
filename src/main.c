@@ -151,6 +151,13 @@ int main(void)
     fflush(stdout);
     puts("");
 
+    // initialize SPI
+    spi_init(spi0, 1000 * 1000);
+    gpio_set_function(RADIO_MOSI, GPIO_FUNC_SPI);
+    gpio_set_function(RADIO_MISO, GPIO_FUNC_SPI);
+    gpio_set_function(RADIO_SCLK, GPIO_FUNC_SPI);
+
+    // initialize the LED
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
     gpio_put(LED_PIN, 1);
@@ -162,7 +169,7 @@ int main(void)
     RadioEvents.RxTimeout = OnRxTimeout;
     RadioEvents.RxError = OnRxError;
 
-    Radio.Init(&RadioEvents);
+    Radio.Init(&RadioEvents, spi0);
 
     while (1)
     {
