@@ -122,6 +122,19 @@ uint16_t irq_status;
 RadioError_t device_error;
 RadioStatus_t device_status;
 
+
+bool toggle_led(__unused struct repeating_timer *t) {
+    printf("Repeat at %lld\n", time_us_64());
+    int s=gpio_get(LED_PIN);
+    if(s) {
+        gpio_put(LED_PIN, 0);
+    } else {
+        gpio_put(LED_PIN, 1);
+    }    
+    return true;
+}
+
+
 /**
  * Main application entry point.
  */
@@ -169,15 +182,14 @@ int main(void)
     RadioEvents.RxTimeout = OnRxTimeout;
     RadioEvents.RxError = OnRxError;
 
+     struct repeating_timer timer;
+    add_repeating_timer_ms(-500,toggle_led, NULL, &timer);
+
     Radio.Init(&RadioEvents, spi0);
 
-    while (1)
-    {
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 1);
-        sleep_ms(250);
-    }
+
+
+
 
     // RP2040-LoRa-LF
     //    Radio.SetChannel(433000000);
